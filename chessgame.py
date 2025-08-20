@@ -1,41 +1,58 @@
 import chess
 
-def coordinateFinder(piece, file, row, board): # find the coordinate of the piece that will be moved
-    # loop through squares on the chess board and check using a function if the piece that exists on the square matches the variable piece.
-    # if it does, try to move the piece to the specified square using the file and row variables, if it fails, continue the loop until it suceeds.
+def MakeMove(moveparts, board, turn):
+        for square in range(64): # number of squares on chess board
+            if (len(moveparts) == 3): # piece move
+                if (str(board.piece_at(square)) == moveparts[0]):
+                    destination = chess.parse_square(moveparts[1]+moveparts[2])
+                    move = chess.Move(square, destination) 
+                    if move in board.legal_moves:
+                        board.push(move)
+                        return
+                    else:
+                        continue
+            elif (len(moveparts) == 2): # pawn move
+                if (str(board.piece_at(square)) == ("P")):
+                    moveparts[0]=moveparts[0].lower()
+                    destination = chess.parse_square(moveparts[0]+moveparts[1])
+                    move = chess.Move(square, destination) 
+                    if move in board.legal_moves:
+                        board.push(move)
+                        return
+                elif (str(board.piece_at(square)) == ("p")):
+                    moveparts[0]=moveparts[0].lower()
+                    destination = chess.parse_square(moveparts[0]+moveparts[1])
+                    move = chess.Move(square, destination)
+                    if move in board.legal_moves:
+                        board.push(move)
+                        return
 
-    
-    for i in range(64):
-        if (str(board.piece_at(i)) == piece):
-            destination = chess.parse_square(file+row)
-            move = chess.Move(i, destination) 
-            if move in board.legal_moves:
-                board.push(move)
-                return
-            else:
-                continue
-        else:
-            if (board.piece_at(i) == str(piece)): # debugging
-                print("angry")
-            print("board.piece_at(i): "+ str(board.piece_at(i)))
-            print("piece: "+ piece)
-    print("bananas")        
-    return
-    
-
+                
 
 
 def main():
     board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     print(board)
+    moves = 0
     while (board.is_game_over(claim_draw=True) == False):
+        if (moves % 2 == 1):
+            turn = "black"
+        elif (moves % 2 == 0):
+            turn = "white"
+            
         move = input("Enter your chess move(enter 'a' for instructions) ")
         
         if (move == "a"):
             print("\nEnter your chess move in algebraic chess notation without any extra characters (Case sensitive)\n")
         else:
-            parts = list(move)
-            coordinateFinder(parts[0], parts[1], parts[2], board)
+            moveparts = list(move)
+            # in python chess's board, white pieces are represented by uppercase letters, and vice versa 
+            print(turn)
+            if (turn == "white"):
+                moveparts[0] = moveparts[0].upper()
+            elif (turn == "black"):
+                moveparts[0] = moveparts[0].lower()
+            MakeMove(moveparts, board, turn)
             print(board)
-    print(board)
+            moves += 1
 main()
